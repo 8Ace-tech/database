@@ -1,0 +1,53 @@
+import sqlite3
+
+# Create a connection to the database
+conn = sqlite3.connect("people.db")
+
+# Create a cursor object to execute SQL commands
+cursor = conn.cursor()
+
+# Create a table to store people's information
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS people (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    age INTEGER,
+    email TEXT
+)
+""")
+
+# Function to add a person to the database
+def add_person(name, age, email):
+    cursor.execute("INSERT INTO people (name, age, email) VALUES (?, ?, ?)", (name, age, email))
+    conn.commit()
+    print("Person added successfully")
+
+# Function to retrieve all people from the database
+def get_people():
+    cursor.execute("SELECT * FROM people")
+    people = cursor.fetchall()
+    return people
+
+# Function to search for people by name
+def search_people(name):
+    cursor.execute("SELECT * FROM people WHERE name LIKE ?", (f"%{name}%",))
+    people = cursor.fetchall()
+    return people
+
+# Example usage
+add_person("John Doe", 25, "johndoe@example.com")
+add_person("Jane Smith", 35, "janesmith@example.com")
+add_person("Bob Johnson", 42, "bobjohnson@example.com")
+
+all_people = get_people()
+print("All people:")
+for person in all_people:
+    print(person)
+
+search_results = search_people("Jane")
+print("Search results:")
+for result in search_results:
+    print(result)
+
+# Close the connection to the database
+conn.close()
